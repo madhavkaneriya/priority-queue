@@ -1,5 +1,5 @@
 /**
- * Created by madhav on 28/2/17.
+ * Author : madhavkaneriya.
  * Processes tasks based on time and priority
  */
 'use strict';
