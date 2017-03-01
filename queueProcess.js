@@ -1,11 +1,11 @@
 /**
- * Author : madhavkaneriya.
+ * Author : madhavkaneriya
  * Processes tasks based on time and priority
  */
 'use strict';
-var fileName = process.argv[2];//Get filename/path from argument
+var fileName = process.argv[2];             //Get filename/path from argument
 var queue = [];
-var csv = require('csvtojson');
+var csv = require('csvtojson');             //Library to convert csv data to json
 csv()
   .fromFile(fileName)
   .on('json',function(jsonObj){
@@ -41,9 +41,9 @@ function executeTask(){
 
     if (now.getDate() === timeToExpire.getDate() && now.getHours() === timeToExpire.getHours() && now.getMinutes() === timeToExpire.getMinutes()) {
 
-      console.log('Current time ['+ now.getFullYear() +"/"+ (now.getMonth()+1) + '/'+ now.getDate() + " "+ now.getHours() + ":" + now.getMinutes() +'] , Event "'+queue[0].event_name+'" Processed');     //Output string
+      console.log('Current time ['+ now.getFullYear() + '/' + (now.getMonth()+1) + '/' + now.getDate() + ' ' + now.getHours() + ':' + now.getMinutes() +'] , Event "'+queue[0].event_name+'" Processed');     //Output string
 
-      queue.shift();                      //Remove task from head
+      queue.shift();                      //Remove task from queue head
 
       if(queue.length > 0) executeTask(); //Execute next task
       else return;                        //Queue empty
