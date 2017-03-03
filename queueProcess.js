@@ -2,10 +2,15 @@
  * Author : madhavkaneriya
  * Processes tasks based on time and priority
  */
+
 'use strict';
-var fileName = process.argv[2];             //Get filename/path from argument
-var queue = [];
-var csv = require('csvtojson');             //Library to convert csv data to json
+var csv = require('csvtojson'),             //Library to convert csv data to json
+    moment = require('moment'),
+    schedule = require('node-schedule'),
+    fileName = process.argv[2],             //Get filename/path from second argument
+    startTime = new Date(process.argv[3]),  //Get start time from third argument
+    queue = [];
+
 csv()
   .fromFile(fileName)
   .on('json',function(jsonObj){
@@ -19,39 +24,12 @@ csv()
         return (new Date(a.time_to_expire) - new Date(b.time_to_expire)) || (a.priority - b.priority)
       });
 
-      (function checkStartTime(){
-        var now = new Date();
-        var startTime = new Date(process.argv[3]); //Get start time for execution
-
-        if (now.getDate() === startTime.getDate() && now.getHours() === startTime.getHours() && now.getMinutes() === startTime.getMinutes()) {
-          executeTask();                           //Start task execution
-        }else{
-          now = new Date();
-          var delay = 60000 - (now % 60000);       //Exact ms to next minute interval
-          setTimeout(checkStartTime, delay);
-        }
-      })()
+      schedule.scheduleJob(startTime, function(){   //Schedule at start time
+        queue.forEach(function(item){
+          schedule.scheduleJob(new Date(item.time_to_expire), function(){
+            console.log('Current time ['+ moment().format("YYYY/MM/DD hh:mm") +'] , Event "' + item.event_name+'" Processed');//Output string
+          });
+        });
+      });
     }
   });
-
-function executeTask(){
-  (function loop(){
-    var now = new Date();
-    var timeToExpire = new Date(queue[0].time_to_expire);
-
-    if (now.getDate() === timeToExpire.getDate() && now.getHours() === timeToExpire.getHours() && now.getMinutes() === timeToExpire.getMinutes()) {
-
-      console.log('Current time ['+ now.getFullYear() + '/' + (now.getMonth()+1) + '/' + now.getDate() + ' ' + now.getHours() + ':' + now.getMinutes() +'] , Event "'+queue[0].event_name+'" Processed');     //Output string
-
-      queue.shift();                      //Remove task from queue head
-
-      if(queue.length > 0) executeTask(); //Execute next task
-      else return;                        //Queue empty
-
-    }else{
-      now = new Date();
-      var delay = 60000 - (now % 60000);  //Exact ms to next minute interval
-      setTimeout(loop, delay);
-    }
-  })();
-}
