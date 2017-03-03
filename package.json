@@ -6,6 +6,8 @@
     "start": "node queueProcess.js"
   },
   "dependencies": {
-    "csvtojson": "^1.1.4"
+    "csvtojson": "^1.1.4",
+    "moment": "^2.17.1",
+    "node-schedule": "^1.2.0"
   }
 }
